@@ -1,0 +1,125 @@
+{# ============================================================
+   OSINT BBW Tool — Plattform-Sektion (Partial)
+   Rayquaza — 2026-06-29
+
+   Enthalten: Donut-Diagramm (SVG, mehrfarbig) mit Legende.
+   Jede Plattform wird mit ihrer offiziellen Markenfarbe
+   dargestellt (Instagram-Lila, GitHub-Schwarz, YouTube-Rot …).
+
+   Daten aus {{ platforms }}-Kontext:
+     platforms.labels  = ["GitHub", "Reddit", ...]
+     platforms.data    = [3, 2, ...]          (absolute Häufigkeiten)
+     platforms.colors  = ["#181717", "#FF4500", ...]
+     platforms.total   = 7
+     platforms.has_data = true/false
+
+   Transformation für JavaScript:
+     [{label, percentage, color}] via Jinja2-Schleife.
+   ============================================================ #}
+
+{# === Daten für JavaScript aufbereiten === #}
+{% set platform_js_list = [] %}
+{% if platforms.has_data and platforms.labels %}
+  {% for i in range(platforms.labels|length) %}
+    {% if platforms.total > 0 %}
+      {% set pct = (platforms.data[i] / platforms.total * 100)|round|int %}
+    {% else %}
+      {% set pct = 0 %}
+    {% endif %}
+    {# Eintrag bauen: {label, percentage, color} #}
+    {% set entry = {
+      "label": platforms.labels[i],
+      "percentage": pct,
+      "color": platforms.colors[i]
+    } %}
+    {% set _ = platform_js_list.append(entry) %}
+  {% endfor %}
+{% endif %}
+
+<div class="platform-section" aria-labelledby="platform-heading">
+
+  {# === Sektions-Überschrift === #}
+  <h2 id="platform-heading">🌐 Plattform-Verteilung</h2>
+
+  {# === Inhalt: Chart + Legende (Grid-Layout) === #}
+  <div class="platform-content"
+       style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:center;">
+
+    {# ==========================================================
+       LINKE SPALTE: SVG-Donut-Chart
+       data-platforms enthält das JSON für charts.js.
+       Bei deaktiviertem JS oder leeren Daten: Fallback.
+       ========================================================== #}
+    <div class="chart-container">
+      <div id="platform-chart"
+           data-platforms='{{ platform_js_list|tojson }}'
+           class="platform-chart-container"
+           role="img"
+           aria-label="Plattform-Verteilungsdiagramm">
+        {# Noscript-Fallback: einfache Liste statt Diagramm #}
+        <noscript>
+          <div style="padding:20px;text-align:center;color:var(--text-muted);">
+            {% if platforms.has_data %}
+              {{ platforms.total }} Funde auf {{ platforms.labels|length }} Plattformen
+            {% else %}
+              Keine Daten
+            {% endif %}
+          </div>
+        </noscript>
+      </div>
+    </div>
+
+    {# ==========================================================
+       RECHTE SPALTE: Plattform-Legende
+       ========================================================== #}
+    <div class="platform-legend" role="list" aria-label="Plattform-Legende">
+
+      {% if platform_js_list|length > 0 %}
+        {% for platform in platform_js_list %}
+          <div class="platform-item" role="listitem"
+               title="{{ platform.label }}: {{ platform.percentage }}%">
+            {# Farb-Punkt (offizielle Markenfarbe) #}
+            <span class="color-dot"
+                  style="background-color: {{ platform.color|default('#6b7280') }};"
+                  aria-hidden="true"></span>
+
+            {# Plattform-Name #}
+            <span class="platform-name">{{ platform.label|e }}</span>
+
+            {# Prozentwert #}
+            <span class="platform-count">{{ platform.percentage }}%</span>
+          </div>
+        {% endfor %}
+
+        {# Gesamtanzahl #}
+        <div class="platform-item total"
+             style="margin-top:8px;padding-top:8px;
+                    border-top:1px solid var(--border);font-weight:700;">
+          <span class="color-dot"
+                style="background-color:var(--text-muted);"
+                aria-hidden="true"></span>
+          <span class="platform-name">Gesamt</span>
+          <span class="platform-count">{{ platforms.total }} Funde</span>
+        </div>
+
+      {% else %}
+        {# === Fallback: Keine Plattformen gefunden === #}
+        <div class="no-data"
+             style="text-align:center;padding:32px 16px;
+                    color:var(--text-muted);font-style:italic;
+                    background:var(--bg-section);
+                    border-radius:var(--radius-md);
+                    border:1px dashed var(--border);">
+          <p style="margin:0;font-size:0.9rem;">🔍 Keine Plattformen gefunden.</p>
+          <p style="margin:4px 0 0;font-size:0.75rem;">
+            Der Benutzername wurde auf keiner der konfigurierten
+            Plattformen gefunden.
+          </p>
+        </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>

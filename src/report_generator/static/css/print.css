@@ -1,0 +1,327 @@
+/* ============================================================
+   PRINT.CSS — Physische Karteikarte DIN A4
+   Rayquaza — 2026-06-29
+
+   Optimiert den HTML-Report für den physischen Druck.
+   Garantiert: Exakt eine DIN-A4-Seite, kein Scrollen,
+   kein abgeschnittener Inhalt, korrekte Farbwiedergabe.
+
+   Browser-Support:
+   - Chrome/Edge 90+:  print-color-adjust: exact
+   - Firefox 97+:       print-color-adjust: exact
+   - Safari 15+:        -webkit-print-color-adjust: exact
+   ============================================================ */
+
+/* ============================================================
+   @page — DIN A4, minimale Ränder
+   ============================================================ */
+@page {
+  size: A4;
+  margin: 8mm;
+}
+
+/* Keine Seitenzahlen (nur eine Seite) */
+@page {
+  @bottom-center {
+    content: none;
+  }
+  @bottom-left {
+    content: none;
+  }
+  @bottom-right {
+    content: none;
+  }
+  @top-center {
+    content: none;
+  }
+  @top-left {
+    content: none;
+  }
+  @top-right {
+    content: none;
+  }
+}
+
+/* ============================================================
+   @media print — Alle Druck-Regeln
+   ============================================================ */
+@media print {
+  /* ==========================================================
+     GLOBAL: Farbwiedergabe & Basis-Reset
+     ========================================================== */
+
+  /* CRITICAL: Hintergrundfarben und -bilder im Druck erzwingen.
+     Browser entfernen diese standardmäßig, um Tinte zu sparen.
+     print-color-adjust: exact überschreibt dieses Verhalten.
+     Beide Präfixe sind nötig: -webkit- für Safari, ohne für Firefox. */
+  * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    /* WeasyPrint-Kompatibilität: KEINE transforms im Druck */
+    transform: none !important;
+  }
+
+  body {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    background: white !important;
+    color: black !important;
+    font-family: "Helvetica Neue", Arial, sans-serif !important;
+    font-size: 10pt;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  /* ==========================================================
+     ALLE ANIMATIONEN & TRANSITIONEN STOPPEN
+     ========================================================== */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    transition: none !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
+  }
+
+  /* ==========================================================
+     KARTEIKARTE: Exakt eine DIN-A4-Seite
+     ========================================================== */
+
+  .karteikarte {
+    /* Schatten und Hover-Effekte entfernen — Tinte sparen */
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transform: none !important;
+
+    /* Dezenter Rand für die physische Karteikarte */
+    border: 1px solid #cbd5e1 !important;
+
+    /* Volle Breite auf A4 */
+    max-width: 100% !important;
+    width: 100% !important;
+
+    /* Höhe: DIN A4 minus @page-Ränder.
+       297mm (A4-Höhe) - 2 × 8mm (Ränder) = 281mm.
+       Aber wir wollen etwas Spielraum → 277mm. */
+    height: 277mm !important;
+    overflow: hidden !important;
+
+    /* Kein Seitenumbruch innerhalb der Karteikarte.
+       page-break-after: avoid — keine leere Folgeseite.
+       page-break-inside: avoid — Karteikarte nicht zerteilen. */
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+
+    /* Padding etwas reduzieren für mehr Inhalt */
+    padding: 20px !important;
+    margin: 0 auto !important;
+  }
+
+  /* ==========================================================
+     AVATAR: Verkleinern für Print
+     ========================================================== */
+  .karteikarte-avatar,
+  .avatar {
+    max-width: 80px !important;
+    max-height: 80px !important;
+    border-width: 2px !important;
+    box-shadow: none !important;
+  }
+
+  /* ==========================================================
+     TYPOGRAFIE: Schriftgrößen für Print optimieren
+     ========================================================== */
+
+  h1 {
+    font-size: 18pt !important;
+    line-height: 1.2 !important;
+    margin-bottom: 2mm !important;
+  }
+
+  h2 {
+    font-size: 14pt !important;
+    line-height: 1.3 !important;
+    margin-top: 4mm !important;
+    margin-bottom: 2mm !important;
+  }
+
+  h3 {
+    font-size: 12pt !important;
+    line-height: 1.3 !important;
+  }
+
+  p,
+  li {
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+  }
+
+  .meta,
+  .meta span,
+  .meta .label {
+    font-size: 8pt !important;
+  }
+
+  /* ==========================================================
+     RISIKO-SCORE: Groß, aber druckbar
+     ========================================================== */
+  .risk-score-big,
+  .risk-percent {
+    font-size: 36pt !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+  }
+
+  /* Risiko-Farben für Print erhalten */
+  .risk-low {
+    color: #16a34a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .risk-mid {
+    color: #ca8a04 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .risk-high {
+    color: #ea580c !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .risk-critical {
+    color: #dc2626 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    animation: none !important;
+  }
+
+  /* ==========================================================
+     SVG-KREISDIAGRAMM: Farben für Print erzwingen
+     ========================================================== */
+  svg circle,
+  .risk-circle-fill,
+  .risk-circle-bg {
+    stroke: inherit !important;
+    fill: inherit !important;
+    animation: none !important;
+  }
+
+  .risk-circle-svg {
+    width: 140px !important;
+    height: 140px !important;
+  }
+
+  /* ==========================================================
+     PLATTFORM-LEGENDE: Farbpunkte erhalten
+     ========================================================== */
+  .color-dot {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .platform-item {
+    padding: 2px 8px !important;
+  }
+
+  /* ==========================================================
+     ANGRIFFSFLÄCHEN: Platzsparend
+     ========================================================== */
+  .attack-list li {
+    padding: 2px 8px !important;
+    margin-bottom: 1mm !important;
+    border-left-width: 2px !important;
+  }
+
+  /* ==========================================================
+     LINKS: URLs im Druck sichtbar machen
+     ========================================================== */
+  a {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+  }
+
+  /* URL hinter dem Link-Text anzeigen (nur externe Links) */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")" !important;
+    font-size: 7pt !important;
+    color: #64748b !important;
+    word-break: break-all !important;
+  }
+
+  /* Interne Links nicht erweitern */
+  a[href^="#"]::after {
+    content: none !important;
+  }
+
+  /* ==========================================================
+     HIDDEN: Elemente, die NIE gedruckt werden
+     ========================================================== */
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Navigation, Buttons, interaktive Elemente ausblenden */
+  nav,
+  button,
+  .btn,
+  .interactive,
+  [role="navigation"],
+  [role="button"] {
+    display: none !important;
+  }
+
+  /* ==========================================================
+     SEITENUMBRUCH: Keine verwaisten Zeilen
+     ========================================================== */
+
+  /* Überschriften nicht vom Inhalt trennen */
+  h1,
+  h2,
+  h3,
+  h4 {
+    page-break-after: avoid !important;
+    orphans: 3 !important;
+    widows: 3 !important;
+  }
+
+  /* Absätze nicht über Seiten verteilen */
+  p,
+  li {
+    orphans: 2 !important;
+    widows: 2 !important;
+  }
+
+  /* ==========================================================
+     HINTERGRUNDBILDER: Erhalten (Base64-Avatare, etc.)
+     ========================================================== */
+  img {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    max-width: 100% !important;
+  }
+
+  /* ==========================================================
+     WATERMARK: Dezenter Footer mit Tool-Name
+     ========================================================== */
+  .karteikarte-footer {
+    position: absolute !important;
+    bottom: 8mm !important;
+    left: 8mm !important;
+    right: 8mm !important;
+    font-size: 7pt !important;
+    color: #94a3b8 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding-top: 2mm !important;
+  }
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+{# ============================================================
+   OSINT BBW Tool — Basis-Template
+   Rayquaza — 2026-06-29
+
+   Von diesem Template erben alle Report-Seiten (karteikarte.html).
+   Definiert die grundlegende HTML-Struktur, Meta-Tags, CSS/JS-
+   Einbindung und Jinja2-Blöcke für die Template-Inheritance.
+
+   DRY-Prinzip: Alles, was auf JEDER Seite gleich ist,
+   steht HIER — niemals in den Kind-Templates wiederholen.
+
+   W3C-Valides HTML5, Screenreader-optimiert (role, aria-*),
+   Performance-optimiert (CSS im <head>, JS vor </body>).
+
+   Block-Struktur:
+     - title       → <title>-Tag (mit Default)
+     - head_extra  → Zusätzliche <meta>/<link>/<style> im Head
+     - content     → Hauptinhalt (MUSS von Kind-Template gefüllt werden)
+     - scripts_extra → Zusätzliche <script>-Tags vor </body>
+   ============================================================ #}
+<html lang="de">
+<head>
+  {# === Zeichensatz & Encoding === #}
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  {# === Viewport (Responsive) === #}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  {# === IE-Kompatibilität (Edge-Modus erzwingen) === #}
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  {# === SEO & Metadaten === #}
+  <meta name="description" content="OSINT BBW Tool – Automatisierte Sicherheitsanalyse. Erstellt von Rayquaza.">
+  <meta name="author" content="Rayquaza">
+  <meta name="generator" content="OSINT BBW Tool – Rayquaza">
+  <meta name="robots" content="noindex, nofollow">
+
+  {# === Open Graph (Vorschau bei Teilen) === #}
+  <meta property="og:title" content="{% block og_title %}OSINT BBW Tool – Rayquaza{% endblock %}">
+  <meta property="og:description" content="Automatisierte Open-Source-Intelligence-Recherche mit KI-Risikoanalyse.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_DE">
+
+  {# === Favicon (Base64-eingebettet oder statisch) === #}
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🕵️</text></svg>">
+
+  {# === Titel (mit Fallback-Default) === #}
+  <title>{% block title %}OSINT BBW Tool – Rayquaza{% endblock %}</title>
+
+  {# === Stylesheets === #}
+  {# Haupt-Stylesheet (Dark-Mode-First, Custom Properties) #}
+  {# Pfad relativ zum generierten HTML in output/ → ../src/report_generator/static/ #}
+  <link rel="stylesheet" href="../src/report_generator/static/css/style.css">
+
+  {# Print-Stylesheet (DIN A4, print-color-adjust) — nur beim Drucken aktiv #}
+  <link rel="stylesheet" href="../src/report_generator/static/css/print.css" media="print">
+
+  {# === Block: Zusätzliche Head-Elemente === #}
+  {# Kind-Templates können hier z.B. inline <style> oder zusätzliche <meta>-Tags einfügen #}
+  {% block head_extra %}{% endblock %}
+</head>
+
+<body>
+  {# === Sprunglink für Screenreader (Accessibility) === #}
+  <a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;">
+    Zum Hauptinhalt springen
+  </a>
+
+  {# === Hauptinhalt === #}
+  {# Kind-Templates MÜSSEN diesen Block füllen. #}
+  <main id="main-content" role="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  {# === JavaScript (am Ende des Body für Performance) === #}
+  {# Vanilla SVG-Charts — keine externen Abhängigkeiten #}
+  {# Pfad relativ zum generierten HTML in output/ #}
+  <script src="../src/report_generator/static/js/charts.js"></script>
+
+  {# === Block: Zusätzliche Skripte === #}
+  {# Kind-Templates können hier eigene <script>-Tags einfügen #}
+  {% block scripts_extra %}{% endblock %}
+
+  {# === Noscript-Fallback === #}
+  <noscript>
+    <div style="padding:20px;text-align:center;background:#fef2f2;color:#991b1b;
+                border:1px solid #fca5a5;border-radius:8px;margin:20px;">
+      ⚠️ JavaScript ist deaktiviert. Die interaktiven Diagramme können nicht
+      gerendert werden. Der Text-Report ist weiterhin lesbar.
+    </div>
+  </noscript>
+</body>
+</html>

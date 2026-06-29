@@ -1,0 +1,538 @@
+/* ============================================================
+   OSINT BBW Tool — Main Stylesheet
+   Rayquaza — 2026-06-29
+
+   Design-System: Dark-Mode-First, Custom Properties,
+   System-Fontstack, Grid-Layout, SVG-Animationen.
+
+   Browser-Support: Chrome 90+, Firefox 90+, Safari 15+
+   ============================================================ */
+
+/* ============================================================
+   1. CUSTOM PROPERTIES — LIGHT MODE (Default)
+   ============================================================ */
+:root {
+  /* --- Hintergründe --- */
+  --bg-primary: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-section: #f8fafc;
+
+  /* --- Text --- */
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* --- Akzente & Marken --- */
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+
+  /* --- Risiko-Farben (WCAG AA auf weiß) --- */
+  --risk-low: #22c55e;
+  --risk-mid: #eab308;
+  --risk-high: #f97316;
+  --risk-critical: #ef4444;
+
+  /* --- Schatten --- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.12);
+
+  /* --- Typografie --- */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono",
+    Consolas, monospace;
+
+  /* --- Radien --- */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-round: 50%;
+
+  /* --- Abstände --- */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* --- Übergänge --- */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 600ms ease;
+}
+
+/* ============================================================
+   2. DARK MODE — Überschreibt alle Custom Properties
+   ============================================================ */
+/* ============================================================
+   3. RESET & BASE
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background var(--transition-normal),
+    color var(--transition-normal);
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* ============================================================
+   4. KARTEIKARTE — Haupt-Layout (CSS Grid)
+   ============================================================ */
+.karteikarte {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+  max-width: 800px;
+  margin: 20px auto 40px;
+  padding: var(--spacing-xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  transition:
+    box-shadow var(--transition-normal);
+}
+
+.karteikarte:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================
+   5. HEADER-SEKTION — Avatar + Profil-Info (Flexbox)
+   ============================================================ */
+.karteikarte-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--border);
+}
+
+/* --- Avatar --- */
+.karteikarte-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-round);
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  object-fit: cover;
+  flex-shrink: 0;
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.karteikarte-avatar:hover {
+  border-color: var(--accent-hover);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+}
+
+/* --- Profil-Info --- */
+.karteikarte-info {
+  flex: 1;
+  min-width: 0; /* Verhindert Overflow in Flexbox */
+}
+
+.karteikarte-info h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.3;
+}
+
+.karteikarte-info .meta {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm) var(--spacing-md);
+}
+
+.karteikarte-info .meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.karteikarte-info .meta .label {
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   6. RISIKO-SEKTION — Score-Anzeige mit Farbklassen
+   ============================================================ */
+.risk-section {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--spacing-lg);
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-section);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+/* --- Großer Risiko-Score --- */
+.risk-score-big {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transition: color var(--transition-normal);
+}
+
+/* Risiko-Farbklassen (werden dynamisch via Jinja2 gesetzt) */
+.risk-low {
+  color: var(--risk-low);
+}
+
+.risk-mid {
+  color: var(--risk-mid);
+}
+
+.risk-high {
+  color: var(--risk-high);
+}
+
+.risk-critical {
+  color: var(--risk-critical);
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+/* --- Risiko-Label & Beschreibung --- */
+.risk-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.risk-label {
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.risk-summary {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   7. SVG-KREISDIAGRAMM — Animiertes Donut-Chart
+   ============================================================ */
+.chart-section {
+  padding: var(--spacing-md) 0;
+}
+
+.chart-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+/* --- SVG-Kreis --- */
+.risk-circle-svg {
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+}
+
+.risk-circle-bg {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 12;
+}
+
+.risk-circle-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-dasharray: 339.292;
+  transition: stroke-dashoffset 1.5s ease-in-out;
+}
+
+/* --- Prozent-Text im Zentrum --- */
+.risk-circle-text {
+  font-family: var(--font-sans);
+  font-size: 2rem;
+  font-weight: 800;
+  fill: var(--text-primary);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.risk-circle-label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* ============================================================
+   8. PLATTFORM-LEGENDE — Flexbox-Liste
+   ============================================================ */
+.platform-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 200px;
+}
+
+.platform-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.platform-item:hover {
+  background: var(--bg-card-hover);
+}
+
+/* --- Farb-Punkt --- */
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-round);
+  flex-shrink: 0;
+  margin-right: var(--spacing-sm);
+}
+
+.platform-item:hover .color-dot {
+  opacity: 0.8;
+}
+
+/* --- Plattform-Name & Count --- */
+.platform-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.platform-count {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   9. ANGRIFFSFLÄCHEN — Liste mit Icons
+   ============================================================ */
+.attack-surface-section {
+  padding: var(--spacing-md) 0;
+}
+
+.attack-surface-section h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.attack-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.attack-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-section);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.attack-list li:hover {
+  background: var(--bg-card-hover);
+  border-left-color: var(--accent-hover);
+}
+
+.attack-list li::before {
+  content: "⚠";
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+/* ============================================================
+   10. FOOTER — Metadaten
+   ============================================================ */
+.karteikarte-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.karteikarte-footer .brand {
+  font-weight: 700;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+/* ============================================================
+   11. ANIMATIONEN — Keyframes
+   ============================================================ */
+
+/* --- Kreisdiagramm-Füllung --- */
+@keyframes circle-fill {
+  from {
+    stroke-dashoffset: 339.292;
+  }
+  to {
+    /* stroke-dashoffset wird via CSS-Variable --target gesetzt */
+    stroke-dashoffset: var(--target, 339.292);
+  }
+}
+
+/* --- Pulsieren für kritische Risiken --- */
+@keyframes pulse-warning {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* --- Fade-In für die gesamte Karte --- */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.karteikarte {
+  animation: fade-in-up 0.5s ease-out;
+}
+
+/* ============================================================
+   13. UTILITY-KLASSEN
+   ============================================================ */
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.mt-sm {
+  margin-top: var(--spacing-sm);
+}
+
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,100 @@
+{# ============================================================
+   OSINT BBW Tool — Header-Partial
+   Rayquaza — 2026-06-29
+
+   Enthalten: Avatar (Base64 oder SVG-Fallback), Profil-Name,
+   Alter, Wohnort, Interessen. Wird in karteikarte.html
+   via {% include 'partials/header.html' %} eingebunden.
+
+   Edge Cases:
+   - Kein Avatar → SVG-Silhouette (Person mit Kreiskopf)
+   - Alter unbekannt → "Unbekannt"
+   - Wohnort unbekannt → "Nicht ermittelt"
+   - Keine Interessen → "Keine gefunden"
+   ============================================================ #}
+
+<div class="karteikarte-header" role="banner" aria-label="Profil-Header">
+
+  {# === Avatar === #}
+  <div class="avatar-container">
+    {% if avatar_base64 %}
+      {# Base64-kodiertes Bild (PNG oder SVG) aus html_renderer.py #}
+      <img src="{{ avatar_base64 }}"
+           alt="Avatar von {{ profile.name|e }}"
+           class="karteikarte-avatar"
+           width="120"
+           height="120"
+           loading="eager">
+    {% else %}
+      {# SVG-Platzhalter: Personensilhouette (Kreiskopf + Ellipsenkörper) #}
+      <div class="avatar-placeholder" aria-hidden="true">
+        <svg viewBox="0 0 120 120"
+             width="120"
+             height="120"
+             class="karteikarte-avatar"
+             role="img"
+             aria-label="Platzhalter-Avatar">
+          {# Hintergrundkreis #}
+          <circle cx="60" cy="60" r="58"
+                  fill="var(--bg-section, #f1f5f9)"
+                  stroke="var(--border, #e2e8f0)"
+                  stroke-width="2"/>
+          {# Kopf (Kreis) #}
+          <circle cx="60" cy="42" r="22"
+                  fill="var(--text-muted, #94a3b8)"/>
+          {# Körper (Ellipse, überlappend mit Kopf) #}
+          <ellipse cx="60" cy="105" rx="40" ry="28"
+                   fill="var(--text-muted, #94a3b8)"/>
+          {# Fragezeichen im Zentrum (wenn kein Avatar verfügbar) #}
+          <text x="60" y="80" text-anchor="middle"
+                font-size="28" font-weight="bold"
+                fill="var(--bg-card, #ffffff)"
+                font-family="var(--font-sans)">?</text>
+        </svg>
+      </div>
+    {% endif %}
+  </div>
+
+  {# === Profil-Informationen === #}
+  <div class="karteikarte-info">
+    <h1>{{ profile.name|e }}</h1>
+    <div class="meta">
+      <span>
+        <span class="label">Alter</span>
+        {{ profile.alter|default("Unbekannt", true)|e }}
+      </span>
+      <span>
+        <span class="label">Wohnort</span>
+        {{ profile.wohnort|default("Nicht ermittelt", true)|e }}
+      </span>
+    </div>
+
+    {# === Interessen (nur anzeigen, wenn vorhanden) === #}
+    {% if profile.interessen and profile.interessen|length > 0 %}
+      <div class="interests" style="margin-top: 8px;">
+        <span class="label">Interessen</span>
+        <span style="color: var(--text-secondary); font-size: 0.85rem;">
+          {{ profile.interessen|join(', ')|e }}
+        </span>
+      </div>
+    {% else %}
+      <div class="interests" style="margin-top: 8px;">
+        <span class="label">Interessen</span>
+        <span style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">
+          Keine gefunden
+        </span>
+      </div>
+    {% endif %}
+
+    {# === Plattform-Statistik (Kurzübersicht) === #}
+    <div class="profile-stats" style="margin-top: 12px; display: flex; gap: 16px; font-size: 0.8rem; color: var(--text-muted);">
+      <span title="Gefundene Profile">
+        📊 {{ total_profiles|default(0) }} Profile
+      </span>
+      <span title="Verschiedene Plattformen">
+        🌐 {{ total_platforms|default(0) }} Plattformen
+      </span>
+    </div>
+  </div>
+
+</div>

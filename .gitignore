@@ -1,0 +1,133 @@
+# ============================================================
+# OSINT BBW Tool — .gitignore
+# Rayquaza — 2026-06-29
+#
+# Defense-in-Depth Strategie:
+# Dieses .gitignore ist die ERSTE Verteidigungsschicht gegen
+# versehentliche Commits von Secrets, Build-Artefakten und
+# lokalen Konfigurationen. Jede Sektion erklärt, WARUM die
+# Dateien ausgeschlossen werden – nicht nur, DASS sie es werden.
+# ============================================================
+
+# === Python-Bytecode & Caches ===
+# Compilierte .pyc-Dateien sind plattformabhängig und ändern sich
+# bei jedem Commit. Sie blähen das Repo auf und erzeugen sinnlose
+# Merge-Konflikte. Werden von Python automatisch neu generiert.
+__pycache__/
+*.py[cod]
+*.pyo
+
+# === Python-Packaging-Artefakte ===
+# Build-Outputs von setuptools/pip. Diese werden bei `pip install -e .`
+# oder `python setup.py build` erzeugt. Gehören in CI-Artefakte, nicht
+# ins Repo. Enthalten kompilierte Extensions, die pro Architektur abweichen.
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# === Virtuelle Python-Umgebungen ===
+# Enthalten den kompletten Interpreter + installierte Pakete (hunderte MB).
+# Diese sind NIE portabel – sie enthalten absolute Pfade und plattform-
+# spezifische Binaries. Jeder Entwickler erstellt seine eigene via:
+#   python -m venv .venv
+venv/
+env/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# === Umgebungsvariablen & Secrets ===
+# KRITISCH: .env enthält API-Keys im Klartext (OPENAI_API_KEY, etc.).
+# Ein einziger Commit dieser Datei in ein öffentliches Repo kompromittiert
+# den Key innerhalb von Sekunden – Bots scrapen GitHub nach Keys.
+# .env.example dagegen IST im Repo (zeigt die Struktur ohne reale Keys).
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets.json
+credentials.json
+
+# === Projekt-Output (generierte Reports) ===
+# HTML- und PDF-Reports enthalten personenbezogene OSINT-Daten, die
+# NIEMALS versioniert werden dürfen (DSGVO/Privacy). Zudem würden sie
+# bei jedem Scan geändert und erzeugen irrelevante Diffs.
+# AUSNAHME: .gitkeep hält den output/-Ordner im Repo, damit Pfade
+# nicht erst zur Laufzeit angelegt werden müssen.
+output/*.html
+output/*.pdf
+output/*.json
+output/*.csv
+!output/.gitkeep
+
+# === IDEs & Editoren ===
+# IDE-Konfigurationen enthalten persönliche Einstellungen (Font-Size,
+# Plugins, Debugger-Pfade), die pro Entwickler abweichen. Werden nicht
+# versioniert, weil sie Build-/Lint-Regeln überschreiben können.
+# Stattdessen: .editorconfig oder pyproject.toml für teamweite Regeln.
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# === Betriebssystem-Dateien ===
+# Vom OS automatisch generierte Metadaten. .DS_Store (macOS) enthält
+# Ordner-Icons und Fenster-Positionen, Thumbs.db (Windows) Thumbnail-
+# Caches. Beide enthalten NULL OSINT-Daten, aber erzeugen Noise im Repo.
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+Thumbs.db:encryptable
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# === Testing & Coverage ===
+# Test-Outputs sind flüchtig und werden bei jedem Testlauf neu generiert.
+# .coverage enthält absolute Pfade → nicht portabel über Entwickler-Rechner.
+# htmlcov/ ist eine statische HTML-Site, die lokal im Browser geöffnet wird.
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+coverage.xml
+*.cover
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# === Logs & Crash-Dumps ===
+# Debug-Logs können versehentlich API-Responses mit sensitiven Daten
+# enthalten. Crash-Dumps (core) sind Binaries und plattformspezifisch.
+*.log
+*.log.*
+pip-log.txt
+pip-delete-this-directory.txt
+core
+*.core
+
+# ============================================================
+# Bei Unsicherheit: Niemals .env committen!
+#
+# Merksatz: Jede Datei, die einen API-Key, ein Passwort, einen
+# privaten SSH-Key oder personenbezogene OSINT-Daten enthält,
+# gehört in .gitignore – nicht ins Repository.
+#
+# Pre-Commit-Check (manuell):
+#   git status                 → welche Dateien wären betroffen?
+#   git diff --cached          → was genau würde committet?
+#   git reset HEAD <datei>     → Datei doch nicht stagen
+# ============================================================

@@ -1,0 +1,121 @@
+{# ============================================================
+   OSINT BBW Tool — Risiko-Sektion (Partial)
+   Rayquaza — 2026-06-29
+
+   Enthalten: Risiko-Kreisdiagramm (SVG, animiert), Score-Prozent,
+   Risikostufe, Angriffsfläche-Liste, KI-Zusammenfassung.
+
+   Alle Werte sind dynamisch aus dem {{ risk }}-Kontext:
+     risk.score, risk.color, risk.level, risk.level_class,
+     risk.attack_surface, risk.summary, risk.ai_score, risk.quant_score
+   ============================================================ #}
+
+<div class="risk-section" aria-labelledby="risk-heading">
+
+  {# === Sektions-Überschrift === #}
+  <h2 id="risk-heading">🔐 Sicherheitsrisiko</h2>
+
+  {# === Risiko-Visualisierung + Angriffsfläche (Grid-Layout) === #}
+  <div class="risk-content" style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start;">
+
+    {# ==========================================================
+       LINKE SPALTE: Kreisdiagramm + Score + Risikostufe
+       ========================================================== #}
+    <div class="risk-visual">
+
+      {# SVG-Kreisdiagramm — wird von charts.js via data-Attribute gerendert.
+         data-risk-score und data-risk-color werden von DOMContentLoaded gelesen.
+         Ohne JS: leerer Container mit CSS-Fallback-Hintergrund. #}
+      <div id="risk-circle"
+           data-risk-score="{{ risk.score }}"
+           data-risk-color="{{ risk.color }}"
+           class="risk-chart-container"
+           role="img"
+           aria-label="Risiko-Kreisdiagramm: {{ risk.score }} Prozent">
+        {# Noscript-Fallback: einfacher farbiger Kreis #}
+        <noscript>
+          <div style="width:120px;height:120px;border-radius:50%;
+                      background: {{ risk.color|default('#94a3b8') }};
+                      margin:0 auto;">
+          </div>
+        </noscript>
+      </div>
+
+      {# Prozentzahl — zentrales visuelles Element #}
+      <div class="risk-percent {{ risk.level_class }}"
+           aria-live="polite"
+           aria-atomic="true">
+        {{ risk.score }}%
+      </div>
+
+      {# Risikostufe (z.B. "HOCH", "KRITISCH") #}
+      <div class="risk-level {{ risk.level_class }}"
+           style="text-transform:uppercase;letter-spacing:2px;
+                  text-align:center;margin-top:8px;font-weight:700;
+                  font-size:0.8rem;">
+        {{ risk.level|upper }}
+      </div>
+
+      {# Score-Aufschlüsselung (KI vs. quantitativ) #}
+      <div class="risk-breakdown"
+           style="margin-top:12px;text-align:center;font-size:0.7rem;
+                  color:var(--text-muted);line-height:1.5;">
+        <span title="KI-Analyse (70 % Gewichtung)">
+          🤖 KI: {{ risk.ai_score }}%
+        </span>
+        &nbsp;·&nbsp;
+        <span title="Quantitative Metrik (30 % Gewichtung)">
+          📊 Daten: {{ risk.quant_score }}%
+        </span>
+      </div>
+    </div>
+
+    {# ==========================================================
+       RECHTE SPALTE: Angriffsfläche-Liste + Zusammenfassung
+       ========================================================== #}
+    <div class="attack-surface">
+
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;
+                 color:var(--text-primary);">
+        🎯 Angriffsfläche
+      </h3>
+
+      {% if risk.attack_surface and risk.attack_surface|length > 0 %}
+        <ul class="attack-list" aria-label="Identifizierte Angriffsflächen">
+          {% for punkt in risk.attack_surface %}
+            <li>
+              <span class="attack-text">{{ punkt|e }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="attack-empty"
+             style="padding:16px;text-align:center;color:var(--text-muted);
+                    font-style:italic;background:var(--bg-section);
+                    border-radius:var(--radius-sm);">
+          Keine Angriffsflächen identifiziert.
+          {% if risk.score == 50 %}
+            <br><small>KI-Analyse nicht verfügbar — manuelle Prüfung empfohlen.</small>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {# === KI-Zusammenfassung (wenn verfügbar) === #}
+      {% if risk.summary and risk.summary|length > 0 %}
+        <div class="risk-summary"
+             style="margin-top:16px;padding:12px 16px;
+                    background:var(--bg-section);
+                    border-left:3px solid {{ risk.color }};
+                    border-radius:var(--radius-sm);
+                    font-size:0.85rem;color:var(--text-secondary);
+                    line-height:1.5;">
+          <strong style="color:var(--text-primary);">📋 Zusammenfassung</strong>
+          <p style="margin-top:4px;">{{ risk.summary|e }}</p>
+        </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>

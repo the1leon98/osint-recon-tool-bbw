@@ -1,0 +1,57 @@
+# OSINT BBW Tool - Dependencies - Getestet mit Python 3.11+
+# Rayquaza - 2026-06-29
+#
+# Alle Versionen sind exakt gepinnt und gemeinsam getestet.
+# Keine Ranges, keine ^/~ – garantiert reproduzierbare Umgebung.
+
+# === HTTP-Stack (requests + implizite Abhängigkeiten) ===
+requests==2.32.3              # HTTP-Client: Sherlock-Scanner (Profilabfragen) + Google-Dorking (GET-Requests)
+certifi==2024.12.14            # SSL-Zertifikatsbundle: verhindert CERTIFICATE_VERIFY_FAILED in Firmennetzen
+urllib3==2.3.0                 # HTTP-Verbindungs-Pool: wird von requests intern genutzt, explizit gepinnt
+
+# === HTML-Parsing & Web-Scraping ===
+beautifulsoup4==4.12.3         # HTML-Parser: extrahiert Google-Suchergebnisse und Sherlock-Profilseiten
+soupsieve==2.6                 # CSS-Selektor-Backend für beautifulsoup4 (wird implizit benötigt)
+lxml==5.3.0                    # Schneller XML/HTML-Parser: Fallback-Parser für defektes HTML bei Google-Dorks
+
+# === Anti-Detection ===
+fake-useragent==1.5.1          # User-Agent-Rotation: verhindert IP-Blocking beim parallelen Scannen
+
+# === Bildverarbeitung (Profilbilder & Plattform-Logos) ===
+Pillow==10.4.0                 # Bildverarbeitung: Profilbild-Downloads verarbeiten, Thumbnails, Format-Konvertierung
+
+# === Async-HTTP (parallele Profilbild-Downloads) ===
+aiohttp==3.9.5                 # Async-HTTP-Client: parallele Profilbild-Downloads via ThreadPoolExecutor
+
+# === KI-Analyse (GPT-4o-mini) ===
+openai==1.55.3                 # OpenAI-Client: kommuniziert mit GPT-4o-mini für Risikoanalyse & Profilzusammenfassung
+httpx==0.28.1                  # Async-HTTP: wird von openai>=1.0 intern für API-Calls genutzt
+tiktoken==0.8.0                # Tokenizer: zählt Tokens vor API-Requests, verhindert 400-Fehler durch Overflow
+
+# === Template-Engine (Report-Generierung) ===
+jinja2==3.1.4                  # Template-Engine: rendert base.html, karteikarte.html → HTML-Report
+markupsafe==3.0.1              # Jinja2-Escaping-Backend (Security-Fix in 3.x, kompatibel mit Jinja2 3.1.4)
+
+# === Konfiguration & Datenvalidierung ===
+pydantic==2.10.3               # Datenvalidierung: typed Settings, Request-Schemas, API-Response-Parsing
+pydantic-settings==2.6.1       # Settings-Management: lädt .env via pydantic BaseSettings (ersetzt python-dotenv intern)
+pydantic-core==2.27.1          # pydantic-v2-Core (Rust): wird von pydantic>=2.0 zwingend benötigt
+python-dotenv==1.0.1           # .env-Loader: parst API-Keys (OPENAI_API_KEY) als Fallback für pydantic-settings
+
+# === CLI-Interface ===
+rich==13.9.4                   # Terminal-UI: Fortschrittsbalken (Live-Display), farbige Risk-Scores, Panel-Layouts
+typing-extensions==4.12.2      # Type-Hints-Backport: benötigt von pydantic+rich für Python 3.11-Kompatibilität
+
+# === PDF-Export ===
+weasyprint==69.0               # PDF-Engine: konvertiert HTML-Report → druckbare Karteikarte (physische Ablage)
+cffi==1.17.1                   # C-Foreign-Function-Interface: wird von weasyprint/cairocffi intern benötigt
+cairocffi==1.7.1               # Cairo-Bindings (via cffi): Rendering-Backend für weasyprint PDFs
+
+# === OSINT-Scan-Plugins ===
+sherlock-project==0.14.4       # Username-Scanner: durchsucht 300+ Plattformen nach Profil-Existenz
+duckduckgo-search==6.3.0       # Fallback-Suche: DuckDuckGo-API wenn Google-Dorking blockiert wird
+
+# === macOS-Hinweis für weasyprint ===
+# Systemabhängigkeiten (via Homebrew installieren):
+#   brew install pango cairo gdk-pixbuf libffi
+# Ohne diese schlägt `weasyprint` mit "no library called libpango-1.0" fehl.

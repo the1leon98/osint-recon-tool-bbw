@@ -1,0 +1,84 @@
+{# ============================================================
+   OSINT BBW Tool — Karteikarte (Haupt-Template)
+   Rayquaza — 2026-06-29
+
+   Erbt von base.html und komponiert die Karteikarten-Ansicht
+   aus drei unabhängigen Partials: Header, Risiko, Plattformen.
+
+   Datenfluss:
+     Python (html_renderer.py) → Jinja2-Kontext → Partials → HTML
+     Python (charts.js)        ← data-Attribute   ← Partials
+   ============================================================ #}
+
+{% extends "base.html" %}
+
+{# === Titel (überschreibt base.html-Block) === #}
+{% block title %}OSINT Karteikarte – {{ profile.name }}{% endblock %}
+
+{# === Open-Graph-Titel === #}
+{% block og_title %}OSINT Karteikarte – {{ profile.name }}{% endblock %}
+
+{# === Hauptinhalt === #}
+{% block content %}
+
+<div class="karteikarte" role="article" aria-label="OSINT-Karteikarte für {{ profile.name }}">
+
+  {# === 1. Header: Avatar + Profil-Info === #}
+  {% include 'partials/header.html' %}
+
+  {# === 2. Risiko-Sektion: Score + Kreisdiagramm + Angriffsflächen === #}
+  {% include 'partials/risk_section.html' %}
+
+  {# === 3. Plattform-Sektion: Donut-Chart + Legende === #}
+  {% include 'partials/platform_section.html' %}
+
+  {# === Footer: Generierungszeitpunkt (wird im Druck ausgeblendet) === #}
+  <div class="karteikarte-footer no-print">
+    <span class="brand">🕵️ Rayquaza OSINT BBW Tool</span>
+    <span class="generated-at">Generiert am {{ generated_at }}</span>
+  </div>
+
+</div>
+
+{# ============================================================
+   INLINE-JAVASCRIPT: Chart-Initialisierung
+   Läuft nach dem DOMContentLoaded-Event (garantiert, dass
+   charts.js bereits geladen ist).
+   ============================================================ #}
+
+{# Plattform-Daten für JS aufbereiten: [{label, percentage, color}] #}
+{% set platform_js_data = [] %}
+{% if platforms.has_data %}
+  {% for i in range(platforms.labels|length) %}
+    {% if platforms.total > 0 %}
+      {% set pct = (platforms.data[i] / platforms.total * 100)|round|int %}
+    {% else %}
+      {% set pct = 0 %}
+    {% endif %}
+    {% set entry = {"label": platforms.labels[i], "percentage": pct, "color": platforms.colors[i]} %}
+    {% set _ = platform_js_data.append(entry) %}
+  {% endfor %}
+{% endif %}
+
+<script>
+  {# Daten als JavaScript-Variablen (valides JSON via |tojson) #}
+  var riskData = {
+    score: {{ risk.score|int }},
+    color: "{{ risk.color }}"
+  };
+  var platformData = {{ platform_js_data|tojson }};
+
+  {# Warten bis DOM + charts.js bereit sind #}
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      drawRiskCircle("risk-circle", riskData.score, riskData.color);
+      drawPlatformChart("platform-chart", platformData);
+    });
+  } else {
+    {# DOM bereits geladen (wenn Script am Ende steht) #}
+    drawRiskCircle("risk-circle", riskData.score, riskData.color);
+    drawPlatformChart("platform-chart", platformData);
+  }
+</script>
+
+{% endblock %}
