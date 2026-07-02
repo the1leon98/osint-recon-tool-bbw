@@ -31,12 +31,14 @@ from src.ai_analyser.prompt_templates import build_risk_prompt
 from src.ai_analyser.risk_calculator import calculate_risk
 from src.cli.input_handler import parse_args
 from src.cli.terminal_banner import (
-    print_banner, print_status, print_result_panel, print_phase_header,
+    print_banner, print_status, print_phase_header,
 )
 from src.osint_engine.google_dorker import GoogleDorker
 from src.osint_engine.result_aggregator import ResultAggregator
 from src.osint_engine.sherlock_scanner import SherlockScanner
 from src.report_generator.terminal_report import render_terminal_report
+from src.report_generator.html_renderer import HTMLRenderer
+from src.report_generator.pdf_exporter import PDFExporter
 
 install_rich_traceback(show_locals=False, width=120)
 console = Console()
@@ -58,6 +60,7 @@ def main() -> None:
     # ================================================================
     print_phase_header(1, 4, "Sherlock-Profilscan")
     sherlock_results = []
+    scanner = None
     try:
         platform_filter = [p.strip() for p in args.platforms.split(",") if p.strip()] if args.platforms else None
         scanner = SherlockScanner(platforms_filter=platform_filter)
@@ -112,10 +115,12 @@ def main() -> None:
         print_status("PHASE 3/4", "KI deaktiviert (--no-ai)", "info")
 
     # ================================================================
-    # PHASE 4: TERMINAL-REPORT
+    # PHASE 4: TERMINAL-REPORT + HTML + PDF
     # ================================================================
-    print_phase_header(4, 4, "Terminal-Report")
+    print_phase_header(4, 4, "Report & PDF-Export")
+    exporter = None
     try:
+        # 4a: Terminal-Report
         render_terminal_report(
             target=target,
             sherlock_results=sherlock_results,
@@ -124,9 +129,33 @@ def main() -> None:
             risk_data=risk_data,
             stats=stats,
         )
-        print_status("PHASE 4/4", "Report fertig!", "ok")
+        print_status("PHASE 4/4", "Terminal-Report fertig", "ok")
+
+        # 4b: HTML rendern + PDF exportieren (mit Diagrammen & Download-Server)
+        if not args.no_server:
+            renderer = HTMLRenderer()
+            html = renderer.render_with_inline_assets(risk_data, aggregated)
+            exporter = PDFExporter()
+            pdf_path = exporter.export(
+                html, risk_data, aggregated, "cyber_akte.pdf", open_browser=True,
+            )
+            print_status("PHASE 4/4", "PDF erstellt & Server gestartet", "ok")
+        else:
+            print_status("PHASE 4/4", "PDF deaktiviert (--no-server)", "info")
+
     except Exception as e:
         print_status("PHASE 4/4", f"Fehler: {e}", "error")
+
+    # Server am Leben halten, bis Nutzer Ctrl+C drückt
+    if exporter is not None:
+        try:
+            console.print("[dim]🌐 Server läuft – Drücke Ctrl+C zum Beenden.[/]")
+            while True:
+                import time
+                time.sleep(1)
+        except KeyboardInterrupt:
+            exporter.stop_server()
+            console.print("\n[yellow]🛑 Server gestoppt.[/]")
 
 
 if __name__ == "__main__":

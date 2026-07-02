@@ -25,7 +25,7 @@ console = Console()
 def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "BBW Recon Tool v2.0 — "
+            "BBW OSINT Tool v2.0 — "
             "Automatisierte Open-Source-Intelligence-Recherche\n\n"
             "Durchsucht Social-Media-Plattformen nach einem Zielnamen, "
             "führt Google-Dorking durch und erstellt "
