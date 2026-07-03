@@ -60,24 +60,38 @@
   {% endfor %}
 {% endif %}
 
+{# Kategorie-Daten für JS-Donut-Chart: [{label, percentage, color}] #}
+{% set category_js_data = [] %}
+{% if categories.has_data %}
+  {% for i in range(categories.labels|length) %}
+    {% if categories.total > 0 %}
+      {% set pct = (categories.data[i] / categories.total * 100)|round|int %}
+    {% else %}
+      {% set pct = 0 %}
+    {% endif %}
+    {% set entry = {"label": categories.labels[i], "percentage": pct, "color": categories.colors[i]} %}
+    {% set _ = category_js_data.append(entry) %}
+  {% endfor %}
+{% endif %}
+
 <script>
   {# Daten als JavaScript-Variablen (valides JSON via |tojson) #}
   var riskData = {
     score: {{ risk.score|int }},
     color: "{{ risk.color }}"
   };
-  var platformData = {{ platform_js_data|tojson }};
+  var categoryData = {{ category_js_data|tojson }};
 
   {# Warten bis DOM + charts.js bereit sind #}
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
       drawRiskCircle("risk-circle", riskData.score, riskData.color);
-      drawPlatformChart("platform-chart", platformData);
+      drawPlatformChart("platform-chart", categoryData);
     });
   } else {
     {# DOM bereits geladen (wenn Script am Ende steht) #}
     drawRiskCircle("risk-circle", riskData.score, riskData.color);
-    drawPlatformChart("platform-chart", platformData);
+    drawPlatformChart("platform-chart", categoryData);
   }
 </script>
 

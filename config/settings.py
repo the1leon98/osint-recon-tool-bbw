@@ -41,7 +41,7 @@ class Settings(BaseSettings):
 
     output_dir: Path = Field(
         default_factory=lambda: Path(__file__).resolve().parent.parent / "output",
-        description="Ausgabeverzeichnis für generierte Reports (HTML und PDF)",
+        description="Ausgabeverzeichnis für generierte Reports",
     )
 
     template_dir: Path = Field(

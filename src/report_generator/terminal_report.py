@@ -144,16 +144,36 @@ def render_terminal_report(
         ))
     
     # ═══════════════════════════════════════
-    # VERTEILUNG (ASCII-Balken)
+    # VERTEILUNG (ASCII-Balken) — nach Kategorien gruppiert
     # ═══════════════════════════════════════
-    distribution = aggregated.get("distribution_percent", {})
-    if distribution:
+    cat_dist = aggregated.get("category_distribution_percent", {})
+    cat_counts = aggregated.get("category_distribution", {})
+    if cat_dist:
         console.print()
-        console.print(f"[bold {CYAN}]📊 VERTEILUNG[/]")
-        for name, pct in sorted(distribution.items(), key=lambda x: x[1], reverse=True):
-            bar_w = max(1, int(pct / 2))
-            emoji = PLATFORM_EMOJIS.get(name, "🔗")
-            console.print(f"  {emoji} {name:15s} [dim]{'█' * bar_w}[/] {pct}%")
+        console.print(f"[bold {CYAN}]📊 VERTEILUNG NACH KATEGORIEN[/]")
+
+        # Emoji-Mapping für Kategorien
+        cat_emojis = {
+            "Social Media": "📱",
+            "Business / Tech": "💼",
+            "Öffentliche Foren": "💬",
+            "Gaming": "🎮",
+            "Sonstiges": "🔗",
+        }
+
+        for cat_name, pct in sorted(cat_dist.items(), key=lambda x: x[1], reverse=True):
+            emoji = cat_emojis.get(cat_name, "📊")
+            count = cat_counts.get(cat_name, 0)
+            console.print(f"  {emoji} {cat_name:20s} {pct}%  ({count} Funde)")
+
+        # Einzel-Plattformen als Detail
+        distribution = aggregated.get("distribution_percent", {})
+        if distribution:
+            console.print()
+            console.print(f"[dim]  ── Details pro Plattform ──[/]")
+            for name, pct in sorted(distribution.items(), key=lambda x: x[1], reverse=True):
+                emoji = PLATFORM_EMOJIS.get(name, "🔗")
+                console.print(f"  [dim]  {emoji} {name:15s} {pct}%[/]")
     
     console.print()
     console.print(f"[dim]{'─' * 60}[/]")

@@ -195,15 +195,15 @@ Alle Einstellungen in `.env` (aus `.env.example` kopieren):
 
 MIT License — siehe [LICENSE](LICENSE)-Datei.
 
-Copyright (c) 2026 ShadowPhantom
+Copyright (c) 2026 rayquaza
 
 ---
 
 ## 👤 Autor
 
-**ShadowPhantom** — OSINT-Security-Researcher
+**rayquaza** — OSINT-Security-Researcher
 
-- Projekt: `github.com/shadowphantom/osint-recon-tool`
+- Projekt: `github.com/the1leon98/osint-recon-tool`
 - Erstellt: 2026-06-29
 - Python 3.11+ · OpenAI GPT-4o-mini · Vanilla JS SVG-Charts
 

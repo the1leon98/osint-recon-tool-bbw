@@ -37,7 +37,9 @@ Autor: Rayquaza
 Datum: 2026-06-29
 """
 
+import json
 from collections import Counter
+from pathlib import Path
 from typing import Any
 
 
@@ -59,6 +61,34 @@ class ResultAggregator:
         "google_dork": 0.4,
         "duckduckgo": 0.35,
     }
+
+    # Cache für Platform→Kategorie-Mapping (aus platforms.json)
+    _platform_category_map: dict[str, str] | None = None
+    _category_meta: dict[str, dict] | None = None
+
+    @classmethod
+    def _load_platform_categories(cls) -> None:
+        """Lädt das platform→Kategorie-Mapping einmalig aus platforms.json."""
+        if cls._platform_category_map is not None:
+            return
+
+        config_path = Path(__file__).resolve().parent.parent.parent / "config" / "platforms.json"
+        try:
+            with open(config_path, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+            cls._platform_category_map = {}
+            for p in data.get("platforms", []):
+                name = p.get("name", "")
+                category = p.get("category", "Sonstiges")
+                if name:
+                    cls._platform_category_map[name] = category
+            cls._category_meta = data.get("categories", {})
+        except (FileNotFoundError, json.JSONDecodeError) as exc:
+            import logging
+            logging.getLogger(__name__).warning("Konnte platforms.json nicht laden: %s", exc)
+            cls._platform_category_map = {}
+            cls._category_meta = {}
+
 
     # ------------------------------------------------------------------
     # Öffentliche API
@@ -154,13 +184,18 @@ class ResultAggregator:
 
         distribution = dict(platform_counter)
 
-        # --- Phase 4: Ergebnis-Dict bauen ---
+        # --- Phase 4: Kategorie-Verteilung berechnen ---
+        category_distribution, category_distribution_percent = self._group_by_category(distribution)
+
+        # --- Phase 5: Ergebnis-Dict bauen ---
         return {
             "username": username,
             "total_profiles": len(merged),
             "platforms": dict(merged),  # Key = normalisierte URL
             "distribution": distribution,
             "distribution_percent": self._calc_percentages(distribution),
+            "category_distribution": category_distribution,
+            "category_distribution_percent": category_distribution_percent,
             "raw_sherlock": sherlock_results,
             "raw_dork": dork_results,
         }
@@ -329,6 +364,38 @@ class ResultAggregator:
             name: round((count / total) * 100, 1)
             for name, count in distribution.items()
         }
+
+    def _group_by_category(
+        self, distribution: dict[str, int]
+    ) -> tuple[dict[str, int], dict[str, float]]:
+        """
+        Gruppiert die Plattform-Verteilung nach Kategorien.
+
+        Lädt das Mapping aus platforms.json (einmalig gecached) und
+        summiert die Funde pro Kategorie. Plattformen ohne Kategorie
+        fallen unter "Sonstiges".
+
+        Args:
+            distribution: {platform_name: count}
+
+        Returns:
+            Tuple aus (category_counts, category_percentages).
+            Beispiel: ({"Social Media": 5, "Business / Tech": 2}, {"Social Media": 71.4, ...})
+        """
+        # Mapping einmalig laden
+        ResultAggregator._load_platform_categories()
+        platform_map = ResultAggregator._platform_category_map or {}
+
+        # Funde pro Kategorie summieren
+        cat_counter: Counter[str] = Counter()
+        for platform_name, count in distribution.items():
+            category = platform_map.get(platform_name, "Sonstiges")
+            cat_counter[category] += count
+
+        cat_dist = dict(cat_counter)
+        cat_pct = self._calc_percentages(cat_dist)
+
+        return cat_dist, cat_pct
 
     @staticmethod
     def _lookup_field(result: dict, field: str, default: Any = None) -> Any:

@@ -73,7 +73,6 @@ def print_status(phase: str, message: str, status: str = "running") -> None:
         "1": "🔍",
         "2": "🕵️",
         "3": "🧠",
-        "4": "📄",
     }
     phase_emoji = phase_styles.get(phase.split("/")[0].split()[-1][0], "•")
 
@@ -89,7 +88,6 @@ def print_result_panel(
     risk_color: str,
     total_profiles: int,
     total_platforms: int,
-    download_url: str = "",
 ) -> None:
     """
     Zeigt eine farbige Zusammenfassung als Rich Panel.
@@ -101,7 +99,6 @@ def print_result_panel(
         risk_color: Hex-Farbe
         total_profiles: Anzahl gefundener Profile
         total_platforms: Anzahl Plattformen
-        download_url: PDF-Download-URL
     """
     table = Table(box=box.ROUNDED, show_header=False, border_style=CYAN)
     table.add_column("key", style=f"bold {CYAN}", width=16)
@@ -116,12 +113,6 @@ def print_result_panel(
         "📱 PLATTFORMEN:",
         f"{total_profiles} Profile auf {total_platforms} Plattformen",
     )
-
-    if download_url:
-        table.add_row(
-            "📥 DOWNLOAD:",
-            f"[link={download_url}]{download_url}[/]",
-        )
 
     console.print()
     console.print(Panel(table, border_style=CYAN, padding=(1, 2)))

@@ -108,43 +108,6 @@ class HTMLRenderer:
         template = self.env.get_template("karteikarte.html")
         return template.render(**context)
 
-    def render_with_inline_assets(
-        self,
-        analysis_data: dict[str, Any],
-        aggregated_data: dict[str, Any],
-    ) -> str:
-        """
-        Rendert HTML mit INLINE CSS & JS (für WeasyPrint-PDF-Export).
-
-        Liest style.css, print.css und charts.js ein und bettet sie
-        direkt als <style>- und <script>-Tags ein. Dadurch sind keine
-        externen Dateireferenzen nötig — WeasyPrint kann das HTML
-        ohne base_url korrekt verarbeiten.
-        """
-        html = self.render(analysis_data, aggregated_data)
-
-        # CSS-Dateien inline einbetten
-        style_css = (self.static_dir / "css" / "style.css").read_text(encoding="utf-8")
-        print_css = (self.static_dir / "css" / "print.css").read_text(encoding="utf-8")
-        charts_js = (self.static_dir / "js" / "charts.js").read_text(encoding="utf-8")
-
-        # Ersetze <link> durch <style>
-        html = html.replace(
-            '<link rel="stylesheet" href="../src/report_generator/static/css/style.css">',
-            f'<style>\n{style_css}\n</style>',
-        )
-        html = html.replace(
-            '<link rel="stylesheet" href="../src/report_generator/static/css/print.css" media="print">',
-            f'<style media="print">\n{print_css}\n</style>',
-        )
-        # Ersetze <script src> durch inline <script>
-        html = html.replace(
-            '<script src="../src/report_generator/static/js/charts.js"></script>',
-            f'<script>\n{charts_js}\n</script>',
-        )
-
-        return html
-
     def render_and_save(
         self,
         analysis_data: dict[str, Any],
@@ -250,10 +213,15 @@ class HTMLRenderer:
             "summary": analysis_data.get("summary", "Keine Zusammenfassung verfügbar."),
         }
 
-        # === Plattform-Daten für Chart.js ===
+        # === Plattform-Daten für Chart.js (Einzel-Plattformen) ===
         platforms_chart = self._build_chart_data(
             distribution=distribution,
             platforms_detail=aggregated_data.get("platforms", {}),
+        )
+
+        # === Kategorie-Daten für Chart.js (gruppiert) ===
+        category_chart = self._build_category_chart_data(
+            category_distribution=aggregated_data.get("category_distribution", {}),
         )
 
         # === Avatar: ZUERST echtes Profilbild aus Sherlock-Ergebnissen, DANN Fallback ===
@@ -268,6 +236,7 @@ class HTMLRenderer:
             "profile": profile,
             "risk": risk,
             "platforms": platforms_chart,
+            "categories": category_chart,
             "avatar_base64": avatar_base64,
             "generated_at": generated_at,
             "generated_year": str(now.year),
@@ -386,6 +355,73 @@ class HTMLRenderer:
             "data": data,
             "colors": colors,
             "total": sum(data),
+            "has_data": True,
+        }
+
+    def _build_category_chart_data(
+        self,
+        category_distribution: dict[str, int],
+    ) -> dict[str, Any]:
+        """
+        Baut Chart-Daten für die Kategorie-Verteilung (gruppiert).
+
+        Farben pro Kategorie werden aus platforms.json geladen.
+        Reihenfolge: Absteigend nach Häufigkeit sortiert.
+
+        Args:
+            category_distribution: {category_name: count}
+
+        Returns:
+            {
+                "labels": ["Social Media", "Business / Tech", ...],
+                "data": [5, 2, ...],
+                "colors": ["#E4405F", "#0A66C2", ...],
+                "total": 7,
+                "has_data": True
+            }
+        """
+        import json as _json
+        from pathlib import Path as _Path
+
+        if not category_distribution:
+            return {
+                "labels": ["Keine Daten"],
+                "data": [0],
+                "colors": ["#6b7280"],
+                "total": 0,
+                "has_data": False,
+            }
+
+        # Kategorie-Farben aus platforms.json laden
+        cat_colors: dict[str, str] = {}
+        try:
+            config_path = _Path(__file__).resolve().parent.parent.parent / "config" / "platforms.json"
+            with open(config_path, "r", encoding="utf-8") as fh:
+                data = _json.load(fh)
+            for cat_name, cat_info in data.get("categories", {}).items():
+                cat_colors[cat_name] = cat_info.get("color", "#6b7280")
+        except (FileNotFoundError, _json.JSONDecodeError):
+            pass
+
+        # Nach Häufigkeit sortieren
+        sorted_items = sorted(
+            category_distribution.items(), key=lambda kv: kv[1], reverse=True
+        )
+
+        labels: list[str] = []
+        chart_data: list[int] = []
+        colors: list[str] = []
+
+        for name, count in sorted_items:
+            labels.append(name)
+            chart_data.append(count)
+            colors.append(cat_colors.get(name, "#6b7280"))
+
+        return {
+            "labels": labels,
+            "data": chart_data,
+            "colors": colors,
+            "total": sum(chart_data),
             "has_data": True,
         }
 

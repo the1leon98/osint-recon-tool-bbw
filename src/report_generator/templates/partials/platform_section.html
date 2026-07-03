@@ -3,21 +3,39 @@
    Rayquaza — 2026-06-29
 
    Enthalten: Donut-Diagramm (SVG, mehrfarbig) mit Legende.
-   Jede Plattform wird mit ihrer offiziellen Markenfarbe
-   dargestellt (Instagram-Lila, GitHub-Schwarz, YouTube-Rot …).
+   Jede KATEGORIE wird mit ihrer definierten Farbe dargestellt.
 
-   Daten aus {{ platforms }}-Kontext:
-     platforms.labels  = ["GitHub", "Reddit", ...]
-     platforms.data    = [3, 2, ...]          (absolute Häufigkeiten)
-     platforms.colors  = ["#181717", "#FF4500", ...]
-     platforms.total   = 7
-     platforms.has_data = true/false
+   Daten aus {{ categories }}-Kontext (Kategorie-Gruppierung):
+     categories.labels  = ["Social Media", "Business / Tech", ...]
+     categories.data    = [5, 2, ...]          (absolute Häufigkeiten)
+     categories.colors  = ["#E4405F", "#0A66C2", ...]
+     categories.total   = 7
+     categories.has_data = true/false
 
    Transformation für JavaScript:
      [{label, percentage, color}] via Jinja2-Schleife.
    ============================================================ #}
 
-{# === Daten für JavaScript aufbereiten === #}
+{# === Kategorie-Daten für JavaScript aufbereiten === #}
+{% set category_js_list = [] %}
+{% if categories.has_data and categories.labels %}
+  {% for i in range(categories.labels|length) %}
+    {% if categories.total > 0 %}
+      {% set pct = (categories.data[i] / categories.total * 100)|round|int %}
+    {% else %}
+      {% set pct = 0 %}
+    {% endif %}
+    {# Eintrag bauen: {label, percentage, color} #}
+    {% set entry = {
+      "label": categories.labels[i],
+      "percentage": pct,
+      "color": categories.colors[i]
+    } %}
+    {% set _ = category_js_list.append(entry) %}
+  {% endfor %}
+{% endif %}
+
+{# === Plattform-Daten als Detail (für Einzelliste) === #}
 {% set platform_js_list = [] %}
 {% if platforms.has_data and platforms.labels %}
   {% for i in range(platforms.labels|length) %}
@@ -26,7 +44,6 @@
     {% else %}
       {% set pct = 0 %}
     {% endif %}
-    {# Eintrag bauen: {label, percentage, color} #}
     {% set entry = {
       "label": platforms.labels[i],
       "percentage": pct,
@@ -46,21 +63,21 @@
        style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:center;">
 
     {# ==========================================================
-       LINKE SPALTE: SVG-Donut-Chart
-       data-platforms enthält das JSON für charts.js.
+       LINKE SPALTE: SVG-Donut-Chart (Kategorien)
+       data-categories enthält das JSON für charts.js.
        Bei deaktiviertem JS oder leeren Daten: Fallback.
        ========================================================== #}
     <div class="chart-container">
       <div id="platform-chart"
-           data-platforms='{{ platform_js_list|tojson }}'
+           data-categories='{{ category_js_list|tojson }}'
            class="platform-chart-container"
            role="img"
-           aria-label="Plattform-Verteilungsdiagramm">
+           aria-label="Kategorie-Verteilungsdiagramm">
         {# Noscript-Fallback: einfache Liste statt Diagramm #}
         <noscript>
           <div style="padding:20px;text-align:center;color:var(--text-muted);">
-            {% if platforms.has_data %}
-              {{ platforms.total }} Funde auf {{ platforms.labels|length }} Plattformen
+            {% if categories.has_data %}
+              {{ categories.total }} Funde in {{ categories.labels|length }} Kategorien
             {% else %}
               Keine Daten
             {% endif %}
@@ -70,24 +87,24 @@
     </div>
 
     {# ==========================================================
-       RECHTE SPALTE: Plattform-Legende
+       RECHTE SPALTE: Kategorie-Legende
        ========================================================== #}
-    <div class="platform-legend" role="list" aria-label="Plattform-Legende">
+    <div class="platform-legend" role="list" aria-label="Kategorie-Legende">
 
-      {% if platform_js_list|length > 0 %}
-        {% for platform in platform_js_list %}
+      {% if category_js_list|length > 0 %}
+        {% for category in category_js_list %}
           <div class="platform-item" role="listitem"
-               title="{{ platform.label }}: {{ platform.percentage }}%">
-            {# Farb-Punkt (offizielle Markenfarbe) #}
+               title="{{ category.label }}: {{ category.percentage }}%">
+            {# Farb-Punkt (Kategorie-Farbe) #}
             <span class="color-dot"
-                  style="background-color: {{ platform.color|default('#6b7280') }};"
+                  style="background-color: {{ category.color|default('#6b7280') }};"
                   aria-hidden="true"></span>
 
-            {# Plattform-Name #}
-            <span class="platform-name">{{ platform.label|e }}</span>
+            {# Kategorie-Name #}
+            <span class="platform-name">{{ category.label|e }}</span>
 
             {# Prozentwert #}
-            <span class="platform-count">{{ platform.percentage }}%</span>
+            <span class="platform-count">{{ category.percentage }}%</span>
           </div>
         {% endfor %}
 
@@ -99,11 +116,11 @@
                 style="background-color:var(--text-muted);"
                 aria-hidden="true"></span>
           <span class="platform-name">Gesamt</span>
-          <span class="platform-count">{{ platforms.total }} Funde</span>
+          <span class="platform-count">{{ categories.total }} Funde</span>
         </div>
 
       {% else %}
-        {# === Fallback: Keine Plattformen gefunden === #}
+        {# === Fallback: Keine Daten === #}
         <div class="no-data"
              style="text-align:center;padding:32px 16px;
                     color:var(--text-muted);font-style:italic;

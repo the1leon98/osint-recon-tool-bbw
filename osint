@@ -2,7 +2,7 @@
 # ╔══════════════════════════════════════════╗
 # ║   OSINT BBW TOOL v2.0 - Rayquaza        ║
 # ╚══════════════════════════════════════════╝
-PROJEKTORDNER="/Users/macbookausmnorden/Documents/OSINT-TOOL-BBW"
+PROJEKTORDNER="/Users/macbookausmnorden/Documents/projekte/OSINT-TOOL-BBW"
 cd "$PROJEKTORDNER"
 source venv/bin/activate
 python3 main.py "$@"

@@ -1,0 +1,33 @@
+Kurz-Skript (Dauer: ca. 3 Minuten)
+Folie 1: Startseite (0:00 – 0:20)
+[Klick auf Folie 1]
+„Hallo zusammen! Ich präsentiere Ihnen heute mein Projekt ‚Cyber-Akte‘. Dabei geht es um automatisierte OSINT-Recherche und KI-Gefährdungsanalyse. Kurz gesagt: Ich habe untersucht, wie leicht man öffentlich verfügbare Daten aus dem Internet sammeln und gegen jemanden verwenden kann.“
+Folie 2: Die Vision (0:20 – 0:40)
+[Klick zu Folie 2]
+„Die Kernfrage lautet: Wie gläsern sind wir im Netz? Angreifer müssen sich heute selten hacken – wir geben oft schon genug freiwillig preis. Mein Tool sammelt diese verstreuten Infos vollautomatisiert und zeigt das echte Risiko auf.“
+Folie 3: Die Datenquellen (0:40 – 1:00)
+[Klick zu Folie 3]
+„Das Tool nutzt zwei Hauptwege:
+Erstens die Sherlock-Logik: Sie prüft blitzschnell hunderte Plattformen, ob ein Username existiert.
+Zweitens Google Dorking: Wir nutzen gezielte Suchanfragen als Trick, um die strengen Abfrage-Sperren von Plattformen wie Instagram zu umgehen.“
+Folie 4: Der Social Media Bypass (1:00 – 1:20)
+[Klick zu Folie 4]
+„Dieser Bypass funktioniert so: Statt die Profile direkt anzuspringen, sucht das Tool über Google mit Befehlen wie site:instagram.com. Wir lesen dann einfach die öffentlich sichtbaren Text-Vorschauen aus. Das ist extrem effizient und verhindert, dass das Tool blockiert wird.“
+Folie 5: Live-Demo (1:20 – 2:00)
+[Klick zu Folie 5 – Kurzer Wechsel aufs Terminal]
+„Schauen wir uns das live an. Im Terminal tippe ich einfach den Befehl > osint "[USERNAME]" ein. Das Skript läuft los, sucht auf den Plattformen und sammelt die Daten im Hintergrund als sauberes JSON-Format für unsere KI.“
+Folie 6: Die KI als Analyst (2:00 – 2:20)
+[Zurück zur Präsentation & Klick zu Folie 6]
+„Die KI übernimmt danach die Arbeit: Sie sortiert doppelte Daten aus, verknüpft die gefundenen Infos – wie Interessen und Wohnort – und berechnet daraus einen konkreten Risiko-Score für Social Engineering.“
+Folie 7: Gefährdungspotenzial (2:20 – 2:35)
+[Klick zu Folie 7]
+„Hier sehen wir das Ergebnis: Ein Risiko-Score von 85%. Das bedeutet, die digitale Identität ist so weit offen gelegt, dass Identitätsdiebstahl oder gezieltes Phishing kinderleicht wären.“
+Folie 8: Plattform-Verteilung (2:35 – 2:45)
+[Klick zu Folie 8]
+„Das Diagramm zeigt uns auf einen Blick, wo die meisten Spuren hinterlassen wurden – in diesem Fall vor allem im Social-Media-Bereich.“
+Folie 9: Fazit & Reflexion (2:45 – 3:00)
+[Klick zu Folie 9]
+„Mein wichtigstes Learning: Mit Fokus und KI als Unterstützung kann man heute auch als Einsteiger komplexe Software verstehen und ein echtes Sicherheits-Werkzeug bauen.“
+Folie 10: Ende (3:00)
+[Klick zu Folie 10]
+„Vielen Dank für Ihre Aufmerksamkeit. Ich freue mich auf Ihre Fragen!“

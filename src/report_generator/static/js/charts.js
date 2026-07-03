@@ -104,7 +104,7 @@ function drawPlatformChart3D(elementId, platforms) {
   }
   svg += '<circle cx="100" cy="100" r="45" fill="var(--bg-card, white)" stroke="#e0e0e0" stroke-width="1"/>';
   svg += '<text x="100" y="96" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text-primary)">' + platforms.length + '</text>';
-  svg += '<text x="100" y="114" text-anchor="middle" font-size="9" font-weight="600" fill="#94a3b8">PLATTFORMEN</text>';
+  svg += '<text x="100" y="114" text-anchor="middle" font-size="9" font-weight="600" fill="#94a3b8">KATEGORIEN</text>';
   svg += '</svg>';
 
   var legend = '<div class="platform-legend" style="margin-top:16px;">';
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var platEl = document.getElementById('platform-chart');
   if (platEl) {
     try {
-      var data = JSON.parse(platEl.getAttribute('data-platforms') || '[]');
+      var data = JSON.parse(platEl.getAttribute('data-categories') || '[]');
       drawPlatformChart3D('platform-chart', data);
     } catch(e) { console.warn('Chart data parse error:', e); }
   }

@@ -29,7 +29,7 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
             "Automatisierte Open-Source-Intelligence-Recherche\n\n"
             "Durchsucht Social-Media-Plattformen nach einem Zielnamen, "
             "führt Google-Dorking durch und erstellt "
-            "eine KI-gestützte Risikoanalyse mit PDF-Report."
+            "eine KI-gestützte Risikoanalyse direkt im Terminal."
         ),
         epilog="Ethische Nutzung: Nur für eigene Profile und autorisierte Sicherheitsaudits.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -41,9 +41,7 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     )
     parser.add_argument("--keywords", "-k", nargs="+", type=str, default=None, help="Zusätzliche Suchbegriffe")
     parser.add_argument("--platforms", "-p", type=str, default=None, help="Komma-separierte Plattformen")
-    parser.add_argument("--output", "-o", type=str, default=None, help="Ausgabepfad für PDF-Report")
     parser.add_argument("--no-ai", action="store_true", dest="no_ai", default=False, help="KI-Analyse deaktivieren")
-    parser.add_argument("--no-server", action="store_true", dest="no_server", default=False, help="Kein Download-Server – PDF nur speichern")
     parser.add_argument("--verbose", "-v", action="store_true", dest="verbose", default=False, help="Debug-Ausgaben")
 
     if argv is not None:

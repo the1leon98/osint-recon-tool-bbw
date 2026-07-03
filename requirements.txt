@@ -42,16 +42,7 @@ python-dotenv==1.0.1           # .env-Loader: parst API-Keys (OPENAI_API_KEY) al
 rich==13.9.4                   # Terminal-UI: Fortschrittsbalken (Live-Display), farbige Risk-Scores, Panel-Layouts
 typing-extensions==4.12.2      # Type-Hints-Backport: benötigt von pydantic+rich für Python 3.11-Kompatibilität
 
-# === PDF-Export ===
-weasyprint==69.0               # PDF-Engine: konvertiert HTML-Report → druckbare Karteikarte (physische Ablage)
-cffi==1.17.1                   # C-Foreign-Function-Interface: wird von weasyprint/cairocffi intern benötigt
-cairocffi==1.7.1               # Cairo-Bindings (via cffi): Rendering-Backend für weasyprint PDFs
 
 # === OSINT-Scan-Plugins ===
 sherlock-project==0.14.4       # Username-Scanner: durchsucht 300+ Plattformen nach Profil-Existenz
 duckduckgo-search==6.3.0       # Fallback-Suche: DuckDuckGo-API wenn Google-Dorking blockiert wird
-
-# === macOS-Hinweis für weasyprint ===
-# Systemabhängigkeiten (via Homebrew installieren):
-#   brew install pango cairo gdk-pixbuf libffi
-# Ohne diese schlägt `weasyprint` mit "no library called libpango-1.0" fehl.

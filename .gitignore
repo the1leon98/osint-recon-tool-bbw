@@ -54,13 +54,12 @@ secrets.json
 credentials.json
 
 # === Projekt-Output (generierte Reports) ===
-# HTML- und PDF-Reports enthalten personenbezogene OSINT-Daten, die
+# Reports enthalten personenbezogene OSINT-Daten, die
 # NIEMALS versioniert werden dürfen (DSGVO/Privacy). Zudem würden sie
 # bei jedem Scan geändert und erzeugen irrelevante Diffs.
 # AUSNAHME: .gitkeep hält den output/-Ordner im Repo, damit Pfade
 # nicht erst zur Laufzeit angelegt werden müssen.
 output/*.html
-output/*.pdf
 output/*.json
 output/*.csv
 !output/.gitkeep
