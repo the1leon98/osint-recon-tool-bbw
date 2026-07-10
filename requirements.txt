@@ -11,7 +11,7 @@ urllib3==2.3.0                 # HTTP-Verbindungs-Pool: wird von requests intern
 
 # === HTML-Parsing & Web-Scraping ===
 beautifulsoup4==4.12.3         # HTML-Parser: extrahiert Google-Suchergebnisse und Sherlock-Profilseiten
-soupsieve==2.6                 # CSS-Selektor-Backend für beautifulsoup4 (wird implizit benötigt)
+soupsieve==2.8.4                 # CSS-Selektor-Backend für beautifulsoup4 (wird implizit benötigt)
 lxml==5.3.0                    # Schneller XML/HTML-Parser: Fallback-Parser für defektes HTML bei Google-Dorks
 
 # === Anti-Detection ===
