@@ -18,7 +18,7 @@ lxml==5.3.0                    # Schneller XML/HTML-Parser: Fallback-Parser für
 fake-useragent==1.5.1          # User-Agent-Rotation: verhindert IP-Blocking beim parallelen Scannen
 
 # === Bildverarbeitung (Profilbilder & Plattform-Logos) ===
-Pillow==10.4.0                 # Bildverarbeitung: Profilbild-Downloads verarbeiten, Thumbnails, Format-Konvertierung
+Pillow==12.3.0                 # Bildverarbeitung: Profilbild-Downloads verarbeiten, Thumbnails, Format-Konvertierung
 
 # === Async-HTTP (parallele Profilbild-Downloads) ===
 aiohttp==3.9.5                 # Async-HTTP-Client: parallele Profilbild-Downloads via ThreadPoolExecutor
